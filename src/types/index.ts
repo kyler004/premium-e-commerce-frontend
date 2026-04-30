@@ -39,3 +39,18 @@ export interface Product {
     featured: boolean;
 }
 
+// ---- Cart ---------------
+export interface CartItem {
+    product: Product;
+    quantity: number;
+    selectedColor?: Variant;
+    selectedSize?: Variant;
+}
+
+// ─── Filters (for listing page) ────────────────────────────
+export interface Filters {
+    category: string | null;
+    priceRange: [number, number];
+    minRating: number | null;
+    inStockOnly: boolean;
+}
