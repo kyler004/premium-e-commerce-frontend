@@ -7,7 +7,9 @@ const RATINGS = [4, 3, 2];
 const categories = getCategories();
 
 const FilterSidebar = () => {
-    const { filters, setFilter, resetFilters } = useProductStore();
+    const filters = useProductStore((state) => state.filters);
+    const setFilter = useProductStore((state) => state.setFilter);
+    const resetFilters = useProductStore((state) => state.resetFilters);
 
     const hasActiveFilters =
         filters.category !== null ||

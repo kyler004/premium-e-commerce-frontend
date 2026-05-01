@@ -9,9 +9,6 @@ interface ProductState {
     // Actions
     setFilter: <K extends keyof Filters>(key: K, value: Filters[K]) => void;
     resetFilters: () => void;
-
-    // Computed
-    filteredProducts: () => Product[];
 }
 
 const defaultFilters: Filters = {
@@ -21,7 +18,7 @@ const defaultFilters: Filters = {
     inStockOnly: false,
 };
 
-export const useProductStore = create<ProductState>()((set, get) => ({
+export const useProductStore = create<ProductState>()((set) => ({
     products: allProducts,
     filters: defaultFilters,
 
@@ -31,16 +28,18 @@ export const useProductStore = create<ProductState>()((set, get) => ({
         })),
 
     resetFilters: () => set({ filters: defaultFilters }),
-
-    filteredProducts: () => {
-        const { products, filters } = get();
-
-        return products.filter((p) => {
-            if (filters.category && p.category !== filters.category) return false;
-            if (p.price < filters.priceRange[0] || p.price > filters.priceRange[1]) return false;
-            if (filters.minRating && p.rating < filters.minRating) return false;
-            if (filters.inStockOnly && !p.inStock) return false;
-            return true;
-        });
-    },
 }));
+
+export const filterProducts = (products: Product[], filters: Filters) =>
+    products.filter((product) => {
+        if (filters.category && product.category !== filters.category) return false;
+        if (
+            product.price < filters.priceRange[0] ||
+            product.price > filters.priceRange[1]
+        ) {
+            return false;
+        }
+        if (filters.minRating && product.rating < filters.minRating) return false;
+        if (filters.inStockOnly && !product.inStock) return false;
+        return true;
+    });

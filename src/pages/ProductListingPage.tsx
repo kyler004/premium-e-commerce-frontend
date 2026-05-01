@@ -1,9 +1,15 @@
+import { useMemo } from 'react';
 import FilterSidebar from '../components/product/FilterSidebar';
 import ProductGrid from '../components/product/ProductGrid';
-import { useProductStore } from '../store/productStore';
+import { filterProducts, useProductStore } from '../store/productStore';
 
 const ProductListingPage = () => {
-    const filteredProducts = useProductStore((s) => s.filteredProducts());
+    const products = useProductStore((state) => state.products);
+    const filters = useProductStore((state) => state.filters);
+    const filteredProducts = useMemo(
+        () => filterProducts(products, filters),
+        [filters, products]
+    );
 
     return (
         <div className="mx-auto max-w-7xl px-6 py-12">

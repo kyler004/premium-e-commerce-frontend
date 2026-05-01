@@ -1,9 +1,15 @@
-import { useProductStore } from '../../store/productStore';
+import { useMemo } from 'react';
+import { filterProducts, useProductStore } from '../../store/productStore';
 import ProductCard from './ProductCard';
 import { PackageSearch } from 'lucide-react';
 
 const ProductGrid = () => {
-    const filteredProducts = useProductStore((s) => s.filteredProducts());
+    const products = useProductStore((state) => state.products);
+    const filters = useProductStore((state) => state.filters);
+    const filteredProducts = useMemo(
+        () => filterProducts(products, filters),
+        [filters, products]
+    );
 
     if (filteredProducts.length === 0) {
         return (
