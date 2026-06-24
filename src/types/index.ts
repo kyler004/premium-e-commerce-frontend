@@ -2,7 +2,7 @@ export interface Review {
     id: string;
     author: string;
     avatar: string;
-    rating: string;
+    rating: number;
     comment: string;
     date: string;
     verified: boolean;
