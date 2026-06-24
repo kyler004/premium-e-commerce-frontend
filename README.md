@@ -1,84 +1,67 @@
 # Premium E-Commerce
 
-`premium-e-commerce` is a small React storefront built with TypeScript and Vite. It focuses on a polished shopping flow with a product listing page, product detail view, cart management, and a persistent client-side cart powered by Zustand.
+React storefront integrated with the E-commerce Catalog API. Built with TypeScript, Vite, React Router, Zustand, and Tailwind CSS.
 
-## What This Project Includes
+## Features
 
-- Product listing with category, price, rating, and stock filters
-- Product detail pages with image gallery, variant selection, quantity controls, and reviews
-- Cart page with quantity updates, removal, checkout simulation, and order summary
-- Persistent cart state using Zustand `persist`
-- Client-side routing with React Router
-- Tailwind CSS styling with a dark editorial storefront aesthetic
+- Public catalog browsing with search, filters, sorting, and pagination
+- JWT authentication (register, OTP verify, login, password reset)
+- Server-side cart with promo codes
+- Checkout, order history, payment stub, and order cancellation
+- Wishlist with move-to-cart
+- Product reviews (read, write, edit, delete)
+- Staff admin for promotions, categories, products, variants, and inventory
 
 ## Tech Stack
 
-- React 19
-- TypeScript
-- Vite
-- React Router DOM
+- React 19, TypeScript, Vite 7
+- React Router DOM 7
 - Zustand
-- Tailwind CSS
+- Tailwind CSS 4
 - Lucide React
 
-## Project Structure
+## Environment
 
-```text
-src/
-  components/
-    cart/        Cart item row and order summary
-    layout/      Shared app layout and navbar
-    product/     Product cards, filters, gallery, reviews, variants
-    ui/          Reusable presentational primitives
-  data/          Static product catalog data
-  pages/         Route-level pages
-  router/        Application router
-  store/         Zustand stores for products and cart
-  types/         Shared TypeScript types
+Copy `.env.example` to `.env`:
+
+```bash
+VITE_API_BASE_URL=http://127.0.0.1:8000
 ```
+
+Ensure the backend API is running and CORS allows `http://localhost:5173`.
 
 ## Routes
 
-- `/` shows the product catalog and filters
-- `/product/:id` shows an individual product detail page
-- `/cart` shows the current cart and checkout summary
+| Route | Access | Description |
+|---|---|---|
+| `/` | Public | Product listing |
+| `/product/:id` | Public | Product detail + reviews |
+| `/cart` | Verified | Server cart |
+| `/checkout` | Verified | Shipping + checkout |
+| `/orders` | Verified | Order history |
+| `/orders/:id` | Verified | Order detail, pay, cancel |
+| `/wishlist` | Verified | Wishlist |
+| `/login`, `/register`, `/verify-email` | Public | Auth flows |
+| `/account` | Authenticated | Profile |
+| `/admin/*` | Staff | Catalog + promotion admin |
 
-## State Management
-
-The app uses two Zustand stores:
-
-- `productStore` holds the catalog and active filter state
-- `cartStore` manages cart items, quantity changes, totals, and persistence in local storage
-
-Filtering is derived from stable store values in the UI rather than returning computed arrays directly from the store selector path. Cart totals are computed from the current cart state.
-
-## Running The Project
-
-Install dependencies and start the Vite dev server:
+## Scripts
 
 ```bash
 npm install
 npm run dev
-```
-
-Other scripts:
-
-```bash
-npm run lint
 npm run build
+npm run lint
 npm run preview
 ```
 
-## Current Notes
+## Manual QA Checklist
 
-- `npm run lint` passes
-- `npm run build` currently fails because `Review.rating` is typed as `string` in `src/types/index.ts` while the review data and review UI use numeric ratings
-
-## Purpose
-
-This project is a front-end storefront exercise. It is useful as a reference for:
-
-- building a small multi-page React commerce UI
-- structuring route-level pages and reusable components
-- using Zustand for local application state with persistence
-- styling a product-focused interface with Tailwind CSS
+- [ ] Register → verify email → login
+- [ ] Browse products with filters and pagination
+- [ ] Add variant to cart (requires verified login)
+- [ ] Apply/remove promo code
+- [ ] Checkout with shipping form → confirm payment
+- [ ] Add/remove wishlist items, move to cart
+- [ ] Write review on purchased product
+- [ ] Staff: CRUD promotions, categories, products, variants, inventory

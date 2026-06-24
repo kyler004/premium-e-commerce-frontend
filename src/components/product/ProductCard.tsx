@@ -1,90 +1,45 @@
 import { Link } from 'react-router-dom';
-import { ShoppingCart } from 'lucide-react';
-import type { Product } from '../../types';
-import { useCartStore } from '../../store/cartStore';
+import type { Product } from '../../types/api';
+import { getProductImages, isProductInStock } from '../../lib/adapters';
+import { formatPrice } from '../../lib/format';
 import Badge from '../ui/Badge';
 import Rating from '../ui/Rating';
-import Button from '../ui/Button';
 
 interface ProductCardProps {
     product: Product;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-    const addItem = useCartStore((state) => state.addItem);
-
-    const handleQuickAdd = (e: React.MouseEvent) => {
-        e.preventDefault();   // Don't navigate — we're inside a <Link>
-        addItem(product, 1);
-    };
+    const images = getProductImages(product);
+    const inStock = isProductInStock(product);
 
     return (
         <Link
             to={`/product/${product.id}`}
-            className="group relative flex flex-col border border-[#1f1f1f] bg-[#111111]
-                 transition-all duration-300 hover:border-[#e8ff00]/30"
+            className="group relative flex flex-col border border-border bg-surface
+                 transition-all duration-300 hover:border-accent/30"
         >
-            {/* Image Container */}
-            <div className="relative overflow-hidden bg-[#0d0d0d] aspect-square">
+            <div className="relative aspect-square overflow-hidden bg-bg">
                 <img
-                    src={product.images[0]}
+                    src={images[0]}
                     alt={product.name}
-                    className="h-full w-full object-cover transition-transform duration-500
-                     group-hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-
-                {/* Badges — top left */}
-                <div className="absolute left-3 top-3 flex flex-col gap-1">
-                    {product.discount && (
-                        <Badge label={`-${product.discount}%`} variant="discount" />
-                    )}
-                    {!product.inStock && (
+                {!inStock && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/60">
                         <Badge label="Out of Stock" variant="outofstock" />
-                    )}
-                </div>
-
-                {/* Quick Add — appears on hover */}
-                <div className="absolute bottom-0 left-0 right-0 translate-y-full
-                        transition-transform duration-300 group-hover:translate-y-0">
-                    <Button
-                        variant="primary"
-                        size="sm"
-                        fullWidth
-                        disabled={!product.inStock}
-                        onClick={handleQuickAdd}
-                        className="rounded-none"
-                    >
-                        <ShoppingCart size={14} />
-                        Quick Add
-                    </Button>
-                </div>
+                    </div>
+                )}
             </div>
 
-            {/* Info */}
-            <div className="flex flex-1 flex-col gap-2 p-4">
-                {/* Brand */}
-                <span className="text-[10px] font-semibold tracking-widest text-gray-500 uppercase">
-          {product.brand}
-        </span>
-
-                {/* Name */}
-                <h3 className="text-sm font-bold text-white leading-snug group-hover:text-[#e8ff00]
-                       transition-colors line-clamp-2">
+            <div className="flex flex-col gap-2 p-5">
+                <h3 className="text-sm font-black uppercase tracking-wide text-white group-hover:text-accent transition-colors">
                     {product.name}
                 </h3>
-
-                {/* Rating */}
-                <Rating value={product.rating} count={product.reviewCount} />
-
-                {/* Price row */}
-                <div className="mt-auto flex items-baseline gap-2 pt-2">
-                    <span className="text-lg font-black text-white">${product.price}</span>
-                    {product.originalPrice && (
-                        <span className="text-sm text-gray-500 line-through">
-              ${product.originalPrice}
-            </span>
-                    )}
-                </div>
+                {product.average_rating !== null && (
+                    <Rating value={product.average_rating} count={product.review_count} size="sm" />
+                )}
+                <span className="text-lg font-black text-white">{formatPrice(product.price)}</span>
             </div>
         </Link>
     );

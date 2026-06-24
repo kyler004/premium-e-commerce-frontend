@@ -1,45 +1,46 @@
-import { useMemo } from 'react';
+import { useEffect } from 'react';
 import FilterSidebar from '../components/product/FilterSidebar';
 import ProductGrid from '../components/product/ProductGrid';
-import { filterProducts, useProductStore } from '../store/productStore';
+import PageHeader from '../components/ui/PageHeader';
+import Pagination from '../components/ui/Pagination';
+import { useCatalogStore } from '../store/catalogStore';
 
 const ProductListingPage = () => {
-    const products = useProductStore((state) => state.products);
-    const filters = useProductStore((state) => state.filters);
-    const filteredProducts = useMemo(
-        () => filterProducts(products, filters),
-        [filters, products]
-    );
+    const products = useCatalogStore((state) => state.products);
+    const count = useCatalogStore((state) => state.count);
+    const page = useCatalogStore((state) => state.page);
+    const pageSize = useCatalogStore((state) => state.pageSize);
+    const isLoading = useCatalogStore((state) => state.isLoading);
+    const fetchProducts = useCatalogStore((state) => state.fetchProducts);
+    const fetchCategories = useCatalogStore((state) => state.fetchCategories);
+    const setPage = useCatalogStore((state) => state.setPage);
+
+    useEffect(() => {
+        fetchCategories();
+        fetchProducts();
+    }, [fetchCategories, fetchProducts]);
+
+    const totalPages = Math.max(1, Math.ceil(count / pageSize));
 
     return (
-        <div className="mx-auto max-w-7xl px-6 py-12">
+        <div className="mx-auto max-w-7xl px-6 py-12 fade-in-element">
+            <PageHeader
+                eyebrow="Collection"
+                title="All Products"
+                trailing={
+                    <span className="text-sm text-gray-500">
+                        {count} <span className="text-gray-600">{count === 1 ? 'result' : 'results'}</span>
+                    </span>
+                }
+            />
 
-            {/* Page Header */}
-            <div className="mb-10 flex items-end justify-between border-b border-border pb-6">
-                <div>
-                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-500">
-                        Collection
-                    </p>
-                    <h1 className="text-4xl font-black uppercase tracking-tight text-white">
-                        All Products
-                    </h1>
-                </div>
-                <span className="text-sm text-gray-500">
-          {filteredProducts.length}{' '}
-                    <span className="text-gray-600">
-            {filteredProducts.length === 1 ? 'result' : 'results'}
-          </span>
-        </span>
-            </div>
-
-            {/* Body: Sidebar + Grid */}
             <div className="flex gap-12">
                 <FilterSidebar />
                 <div className="flex-1">
-                    <ProductGrid />
+                    <ProductGrid products={products} isLoading={isLoading} />
+                    <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
                 </div>
             </div>
-
         </div>
     );
 };

@@ -1,17 +1,25 @@
-import { useMemo } from 'react';
-import { filterProducts, useProductStore } from '../../store/productStore';
-import ProductCard from './ProductCard';
 import { PackageSearch } from 'lucide-react';
+import type { Product } from '../../types/api';
+import ProductCard from './ProductCard';
+import { ProductCardSkeleton } from '../ui/Skeleton';
 
-const ProductGrid = () => {
-    const products = useProductStore((state) => state.products);
-    const filters = useProductStore((state) => state.filters);
-    const filteredProducts = useMemo(
-        () => filterProducts(products, filters),
-        [filters, products]
-    );
+interface ProductGridProps {
+    products: Product[];
+    isLoading?: boolean;
+}
 
-    if (filteredProducts.length === 0) {
+const ProductGrid = ({ products, isLoading }: ProductGridProps) => {
+    if (isLoading) {
+        return (
+            <div className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                    <ProductCardSkeleton key={i} />
+                ))}
+            </div>
+        );
+    }
+
+    if (products.length === 0) {
         return (
             <div className="flex flex-1 flex-col items-center justify-center gap-4 py-32">
                 <PackageSearch size={48} className="text-border" />
@@ -24,7 +32,7 @@ const ProductGrid = () => {
 
     return (
         <div className="grid flex-1 grid-cols-1 gap-px sm:grid-cols-2 lg:grid-cols-3 bg-border">
-            {filteredProducts.map((product) => (
+            {products.map((product) => (
                 <div key={product.id} className="bg-bg">
                     <ProductCard product={product} />
                 </div>

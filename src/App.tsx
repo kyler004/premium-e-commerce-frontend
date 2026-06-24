@@ -1,7 +1,12 @@
 import { AppRouter } from './router';
+import { ToastProvider } from './components/ui/Toast';
 
 const App = () => {
-    return <AppRouter />;
+    return (
+        <ToastProvider>
+            <AppRouter />
+        </ToastProvider>
+    );
 };
 
 export default App;

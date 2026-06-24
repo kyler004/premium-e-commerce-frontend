@@ -1,98 +1,84 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { CartItem, Product, Variant } from '../types';
+import { cartApi } from '../api/cart';
+import type { Cart } from '../types/api';
+import { parseDecimal } from '../lib/format';
 
 interface CartState {
-    items: CartItem[];
+    cart: Cart | null;
+    isLoading: boolean;
 
-    // Actions
-    addItem: (product: Product, quantity: number, color?: Variant, size?: Variant) => void;
-    removeItem: (productId: string, colorId?: string, sizeId?: string) => void;
-    updateQuantity: (productId: string, quantity: number, colorId?: string, sizeId?: string) => void;
-    clearCart: () => void;
-
-    // Computed (derived values)
+    fetchCart: () => Promise<void>;
+    addItem: (variant: number, quantity?: number) => Promise<void>;
+    updateQuantity: (id: number, quantity: number) => Promise<void>;
+    removeItem: (id: number) => Promise<void>;
+    clearCart: () => Promise<void>;
+    applyPromo: (code: string) => Promise<void>;
+    removePromo: () => Promise<void>;
     totalItems: () => number;
     totalPrice: () => number;
 }
 
-export const useCartStore = create<CartState>()(
-    persist(
-        (set, get) => ({
-            items: [],
+export const useCartStore = create<CartState>()((set, get) => ({
+    cart: null,
+    isLoading: false,
 
-            addItem: (product, quantity, color, size) => {
-                const existing = get().items.find(
-                    (item) =>
-                        item.product.id === product.id &&
-                        item.selectedColor?.id === color?.id &&
-                        item.selectedSize?.id === size?.id
-                );
-
-                if (existing) {
-                    // Same product + same variants → just increase qty
-                    set((state) => ({
-                        items: state.items.map((item) =>
-                            item.product.id === product.id &&
-                            item.selectedColor?.id === color?.id &&
-                            item.selectedSize?.id === size?.id
-                                ? { ...item, quantity: item.quantity + quantity }
-                                : item
-                        ),
-                    }));
-                } else {
-                    // New combination → add as new cart entry
-                    set((state) => ({
-                        items: [
-                            ...state.items,
-                            { product, quantity, selectedColor: color, selectedSize: size },
-                        ],
-                    }));
-                }
-            },
-
-            removeItem: (productId, colorId, sizeId) => {
-                set((state) => ({
-                    items: state.items.filter(
-                        (item) =>
-                            !(
-                                item.product.id === productId &&
-                                item.selectedColor?.id === colorId &&
-                                item.selectedSize?.id === sizeId
-                            )
-                    ),
-                }));
-            },
-
-            updateQuantity: (productId, quantity, colorId, sizeId) => {
-                if (quantity <= 0) {
-                    get().removeItem(productId, colorId, sizeId);
-                    return;
-                }
-                set((state) => ({
-                    items: state.items.map((item) =>
-                        item.product.id === productId &&
-                        item.selectedColor?.id === colorId &&
-                        item.selectedSize?.id === sizeId
-                            ? { ...item, quantity }
-                            : item
-                    ),
-                }));
-            },
-
-            clearCart: () => set({ items: [] }),
-
-            totalItems: () =>
-                get().items.reduce((sum, item) => sum + item.quantity, 0),
-
-            totalPrice: () =>
-                get().items.reduce(
-                    (sum, item) => sum + item.product.price * item.quantity,
-                    0
-                ),
-        }),
-        {
-            name: 'cart-storage', // key in localStorage
+    fetchCart: async () => {
+        set({ isLoading: true });
+        try {
+            const cart = await cartApi.get();
+            set({ cart, isLoading: false });
+        } catch {
+            set({ cart: null, isLoading: false });
         }
-    )
-);
+    },
+
+    addItem: async (variant, quantity = 1) => {
+        set({ isLoading: true });
+        try {
+            const result = await cartApi.addItem(variant, quantity);
+            set({ cart: ('cart' in result ? result.cart : null) ?? get().cart, isLoading: false });
+        } catch (err) {
+            set({ isLoading: false });
+            throw err;
+        }
+    },
+
+    updateQuantity: async (id, quantity) => {
+        set({ isLoading: true });
+        try {
+            const result = await cartApi.updateItem(id, quantity);
+            set({ cart: result.cart ?? get().cart, isLoading: false });
+        } catch {
+            set({ isLoading: false });
+            throw new Error('Failed to update quantity');
+        }
+    },
+
+    removeItem: async (id) => {
+        await cartApi.removeItem(id);
+        await get().fetchCart();
+    },
+
+    clearCart: async () => {
+        await cartApi.clear();
+        set({ cart: null });
+    },
+
+    applyPromo: async (code) => {
+        const cart = await cartApi.applyPromo(code);
+        set({ cart });
+    },
+
+    removePromo: async () => {
+        const cart = await cartApi.removePromo();
+        set({ cart });
+    },
+
+    totalItems: () => get().cart?.item_count ?? 0,
+
+    totalPrice: () => {
+        const cart = get().cart;
+        if (!cart) return 0;
+        return parseDecimal(cart.promotion?.total ?? cart.subtotal);
+    },
+}));
