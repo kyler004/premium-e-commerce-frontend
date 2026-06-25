@@ -71,7 +71,7 @@ const SpendingChart = ({ data, periodLabel }: SpendingChartProps) => {
                             contentStyle={chartTooltipStyle}
                             labelStyle={{ color: '#9ca3af' }}
                             itemStyle={{ color: '#e8ff00' }}
-                            formatter={(value: number) => [`$${Number(value).toFixed(2)}`, 'Spent']}
+                            formatter={(value) => [`$${Number(value ?? 0).toFixed(2)}`, 'Spent']}
                         />
                         <Bar
                             dataKey="total"

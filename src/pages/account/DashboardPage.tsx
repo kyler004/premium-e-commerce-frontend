@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { accountApi } from '../../api/account';
 import type { SpendingPeriod, SpendingSummary } from '../../types/api';
@@ -21,26 +21,47 @@ const PERIOD_LABELS: Record<SpendingPeriod, string> = {
 
 const DashboardPage = () => {
     const [period, setPeriod] = useState<SpendingPeriod>('12m');
+    const [fetchPeriod, setFetchPeriod] = useState<SpendingPeriod>('12m');
     const [summary, setSummary] = useState<SpendingSummary | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const loadSummary = useCallback(async (selectedPeriod: SpendingPeriod) => {
+    useEffect(() => {
+        let cancelled = false;
+        accountApi.getSpendingSummary(period)
+            .then((data) => {
+                if (!cancelled) {
+                    setSummary(data);
+                    setFetchPeriod(period);
+                    setError(null);
+                }
+            })
+            .catch((err) => {
+                if (!cancelled) {
+                    setError(err instanceof ApiError ? parseApiError(err.body) : 'Failed to load dashboard.');
+                }
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+        return () => { cancelled = true; };
+    }, [period]);
+
+    const isRefetching = !loading && fetchPeriod !== period;
+
+    const handleRetry = () => {
         setLoading(true);
         setError(null);
-        try {
-            const data = await accountApi.getSpendingSummary(selectedPeriod);
-            setSummary(data);
-        } catch (err) {
-            setError(err instanceof ApiError ? parseApiError(err.body) : 'Failed to load dashboard.');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        loadSummary(period);
-    }, [period, loadSummary]);
+        accountApi.getSpendingSummary(period)
+            .then((data) => {
+                setSummary(data);
+                setFetchPeriod(period);
+            })
+            .catch((err) => {
+                setError(err instanceof ApiError ? parseApiError(err.body) : 'Failed to load dashboard.');
+            })
+            .finally(() => setLoading(false));
+    };
 
     if (loading && !summary) {
         return (
@@ -61,7 +82,7 @@ const DashboardPage = () => {
                 <PageHeader eyebrow="Account" title="Dashboard" />
                 <div className="border border-red-800/40 bg-red-900/10 p-8 text-center">
                     <p className="text-sm font-semibold uppercase tracking-widest text-red-400">{error}</p>
-                    <Button variant="secondary" className="mt-4" onClick={() => loadSummary(period)}>
+                    <Button variant="secondary" className="mt-4" onClick={handleRetry}>
                         Retry
                     </Button>
                 </div>
@@ -80,19 +101,19 @@ const DashboardPage = () => {
                     <PeriodSelector
                         value={period}
                         onChange={setPeriod}
-                        disabled={loading}
+                        disabled={loading || isRefetching}
                     />
                 }
             />
 
-            <div className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-4 ${loading ? 'opacity-60' : ''}`}>
+            <div className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-4 ${loading || isRefetching ? 'opacity-60' : ''}`}>
                 <KpiCard label="Lifetime Spend" value={formatPrice(summary.lifetime_spend)} accent />
                 <KpiCard label="Paid Orders" value={String(summary.paid_order_count)} />
                 <KpiCard label="Avg Order" value={formatPrice(summary.average_order_value)} />
                 <KpiCard label="Total Saved" value={formatPrice(summary.total_savings)} subtext="From promotions" />
             </div>
 
-            <div className={`mt-8 grid gap-6 lg:grid-cols-2 ${loading ? 'opacity-60' : ''}`}>
+            <div className={`mt-8 grid gap-6 lg:grid-cols-2 ${loading || isRefetching ? 'opacity-60' : ''}`}>
                 <SpendingChart data={summary.spending_by_month} periodLabel={PERIOD_LABELS[period]} />
                 <CategoryChart data={summary.spending_by_category} />
             </div>

@@ -19,7 +19,6 @@ const ReceiptsPage = () => {
 
     useEffect(() => {
         let cancelled = false;
-        setLoading(true);
         ordersApi.list({ status: 'paid', ordering: '-paid_at', page, page_size: 20 })
             .then((data) => {
                 if (!cancelled) {
