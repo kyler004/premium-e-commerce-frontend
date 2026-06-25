@@ -42,7 +42,7 @@ const ImageGallery = ({ images, productName }: ImageGalleryProps) => {
                     key={activeIndex}
                     src={images[activeIndex]}
                     alt={productName}
-                    className="h-full w-full object-cover animate-fadeIn"
+                    className="h-full w-full object-cover fade-in-element"
                 />
 
                 {/* Arrows — only if more than 1 image */}

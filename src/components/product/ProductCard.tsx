@@ -36,8 +36,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 <h3 className="text-sm font-black uppercase tracking-wide text-white group-hover:text-accent transition-colors">
                     {product.name}
                 </h3>
-                {product.average_rating !== null && (
+                {product.average_rating !== null ? (
                     <Rating value={product.average_rating} count={product.review_count} size="sm" />
+                ) : (
+                    <span className="min-h-[14px] text-xs text-gray-600">No reviews</span>
                 )}
                 <span className="text-lg font-black text-white">{formatPrice(product.price)}</span>
             </div>

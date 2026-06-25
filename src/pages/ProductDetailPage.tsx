@@ -14,12 +14,15 @@ import ReviewSection from '../components/product/ReviewSection';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import Rating from '../components/ui/Rating';
-import { PageSkeleton } from '../components/ui/Skeleton';
+import { ProductDetailSkeleton } from '../components/ui/Skeleton';
 import { useToast } from '../hooks/useToast';
 import { ApiError, parseApiError } from '../api/client';
 
-const ProductDetailPage = () => {
-    const { id } = useParams<{ id: string }>();
+interface ProductDetailContentProps {
+    productId: number;
+}
+
+const ProductDetailContent = ({ productId }: ProductDetailContentProps) => {
     const navigate = useNavigate();
     const addItem = useCartStore((s) => s.addItem);
     const isVerified = useIsVerified();
@@ -37,16 +40,15 @@ const ProductDetailPage = () => {
     const [added, setAdded] = useState(false);
 
     useEffect(() => {
-        if (!id) return;
         let cancelled = false;
-        catalogApi.getProduct(Number(id))
+        catalogApi.getProduct(productId)
             .then((p) => { if (!cancelled) setProduct(p); })
             .catch(() => { if (!cancelled) setProduct(null); })
             .finally(() => { if (!cancelled) setLoading(false); });
         return () => { cancelled = true; };
-    }, [id]);
+    }, [productId]);
 
-    if (loading) return <PageSkeleton />;
+    if (loading) return <ProductDetailSkeleton />;
 
     if (!product) {
         return (
@@ -174,6 +176,20 @@ const ProductDetailPage = () => {
             </div>
         </div>
     );
+};
+
+const ProductDetailPage = () => {
+    const { id } = useParams<{ id: string }>();
+
+    if (!id) {
+        return (
+            <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
+                <p className="text-gray-500">Product not found.</p>
+            </div>
+        );
+    }
+
+    return <ProductDetailContent key={id} productId={Number(id)} />;
 };
 
 export default ProductDetailPage;

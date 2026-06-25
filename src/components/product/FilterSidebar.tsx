@@ -1,7 +1,9 @@
+import { useCallback, useState } from 'react';
 import { useCatalogStore } from '../../store/catalogStore';
 import { SlidersHorizontal, X } from 'lucide-react';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
+import { useDebouncedCallback } from '../../hooks/useDebouncedCallback';
 
 const RATINGS = [4, 3, 2];
 
@@ -10,6 +12,30 @@ const FilterSidebar = () => {
     const categories = useCatalogStore((state) => state.categories);
     const setFilter = useCatalogStore((state) => state.setFilter);
     const resetFilters = useCatalogStore((state) => state.resetFilters);
+
+    const [searchInput, setSearchInput] = useState(filters.search);
+    const [priceDraft, setPriceDraft] = useState<number | null>(null);
+    const maxPriceInput = priceDraft ?? filters.max_price;
+
+    const handleResetFilters = () => {
+        resetFilters();
+        setSearchInput('');
+        setPriceDraft(null);
+    };
+
+    const debouncedSearch = useDebouncedCallback(
+        useCallback((value: string) => {
+            setFilter('search', value);
+        }, [setFilter]),
+        300
+    );
+
+    const debouncedMaxPrice = useDebouncedCallback(
+        useCallback((value: number) => {
+            setFilter('max_price', value);
+        }, [setFilter]),
+        300
+    );
 
     const hasActiveFilters =
         filters.category !== null ||
@@ -29,7 +55,7 @@ const FilterSidebar = () => {
                 </div>
                 {hasActiveFilters && (
                     <button
-                        onClick={resetFilters}
+                        onClick={handleResetFilters}
                         className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-gray-500 hover:text-accent transition-colors"
                     >
                         <X size={10} />
@@ -41,8 +67,12 @@ const FilterSidebar = () => {
             <Input
                 label="Search"
                 placeholder="Search products..."
-                value={filters.search}
-                onChange={(e) => setFilter('search', e.target.value)}
+                value={searchInput}
+                onChange={(e) => {
+                    const value = e.target.value;
+                    setSearchInput(value);
+                    debouncedSearch(value);
+                }}
             />
 
             <Select
@@ -98,13 +128,27 @@ const FilterSidebar = () => {
                         min={0}
                         max={500}
                         step={10}
-                        value={filters.max_price}
-                        onChange={(e) => setFilter('max_price', Number(e.target.value))}
-                        className="w-full accent-accent bg-border h-1 cursor-pointer"
+                        value={maxPriceInput}
+                        onChange={(e) => {
+                            const value = Number(e.target.value);
+                            setPriceDraft(value);
+                            debouncedMaxPrice(value);
+                        }}
+                        onMouseUp={(e) => {
+                            const value = Number((e.target as HTMLInputElement).value);
+                            setFilter('max_price', value);
+                            setPriceDraft(null);
+                        }}
+                        onTouchEnd={(e) => {
+                            const value = Number((e.target as HTMLInputElement).value);
+                            setFilter('max_price', value);
+                            setPriceDraft(null);
+                        }}
+                        className="w-full accent-accent bg-border h-1 cursor-pointer disabled:cursor-not-allowed"
                     />
                     <div className="mt-2 flex justify-between text-xs text-gray-500">
                         <span>$0</span>
-                        <span className="font-bold text-white">${filters.max_price}</span>
+                        <span className="font-bold text-white">${maxPriceInput}</span>
                     </div>
                 </div>
             </div>
