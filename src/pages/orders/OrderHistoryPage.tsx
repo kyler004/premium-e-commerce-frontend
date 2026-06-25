@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ordersApi } from '../../api/orders';
-import type { Order } from '../../types/api';
+import type { OrderListItem } from '../../types/api';
 import PageHeader from '../../components/ui/PageHeader';
 import Pagination from '../../components/ui/Pagination';
 import { formatDate, formatPrice } from '../../lib/format';
@@ -15,12 +15,12 @@ const statusVariant = (status: string) => {
 };
 
 const OrderHistoryPageContent = () => {
-    const [orders, setOrders] = useState<Order[]>([]);
+    const [orders, setOrders] = useState<OrderListItem[]>([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
-        ordersApi.list(page, 10).then((data) => {
+        ordersApi.list({ page, page_size: 10 }).then((data) => {
             setOrders(data.results);
             setTotalPages(Math.max(1, Math.ceil(data.count / 10)));
         });

@@ -149,7 +149,11 @@ export const apiClient = {
     delete: <T>(path: string, auth = true) => request<T>(path, { method: 'DELETE', auth }),
 };
 
-export const getPaginated = <T>(path: string, params?: Record<string, string | number | undefined>) => {
+export const getPaginated = <T>(
+    path: string,
+    params?: Record<string, string | number | undefined>,
+    auth = true
+) => {
     const search = new URLSearchParams();
     if (params) {
         for (const [key, value] of Object.entries(params)) {
@@ -157,7 +161,7 @@ export const getPaginated = <T>(path: string, params?: Record<string, string | n
         }
     }
     const query = search.toString();
-    return apiClient.get<PaginatedResponse<T>>(`${path}${query ? `?${query}` : ''}`, false);
+    return apiClient.get<PaginatedResponse<T>>(`${path}${query ? `?${query}` : ''}`, auth);
 };
 
 export const buildQueryPath = (path: string, params?: Record<string, string | number | undefined | null>) => {

@@ -118,9 +118,66 @@ export interface OrderLine {
     quantity: number;
     unit_price: string;
     line_total: string;
+    category_id?: number;
+    category_name?: string;
 }
 
 export type OrderStatus = 'pending' | 'paid' | 'cancelled';
+
+export interface OrderListItem {
+    id: number;
+    status: OrderStatus;
+    total: string;
+    item_count: number;
+    created_at: string;
+    paid_at: string | null;
+}
+
+export interface SpendingByMonth {
+    period: string;
+    total: string;
+    order_count: number;
+}
+
+export interface SpendingByCategory {
+    category_id: number;
+    category_name: string;
+    total: string;
+    order_count: number;
+}
+
+export interface RecentPaidOrder {
+    id: number;
+    total: string;
+    paid_at: string;
+    item_count: number;
+}
+
+export interface SpendingSummary {
+    currency: string;
+    lifetime_spend: string;
+    paid_order_count: number;
+    pending_order_count: number;
+    cancelled_order_count: number;
+    total_savings: string;
+    average_order_value: string;
+    spending_by_month: SpendingByMonth[];
+    spending_by_category: SpendingByCategory[];
+    recent_paid_orders: RecentPaidOrder[];
+}
+
+export type SpendingPeriod = '6m' | '12m' | '24m' | 'all';
+
+export interface OrderListParams {
+    page?: number;
+    page_size?: number;
+    status?: OrderStatus;
+    ordering?: '-paid_at' | '-created_at' | '-total';
+    paid_after?: string;
+    paid_before?: string;
+    created_after?: string;
+    created_before?: string;
+}
 
 export interface Order {
     id: number;

@@ -1,12 +1,12 @@
 import { apiClient, getPaginated } from './client';
-import type { Order, ShippingAddress } from '../types/api';
+import type { Order, OrderListItem, OrderListParams, ShippingAddress } from '../types/api';
 
 export const ordersApi = {
     checkout: (shipping: ShippingAddress) =>
         apiClient.post<Order>('/api/orders/checkout/', { shipping }),
 
-    list: (page = 1, page_size = 10) =>
-        getPaginated<Order>('/api/orders/', { page, page_size }),
+    list: (params: OrderListParams = {}) =>
+        getPaginated<OrderListItem>('/api/orders/', params),
 
     get: (id: number) => apiClient.get<Order>(`/api/orders/${id}/`),
 

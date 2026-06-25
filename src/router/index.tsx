@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import AdminLayout from '../components/admin/AdminLayout';
-import { StaffRoute, AuthenticatedRoute } from './guards';
+import { StaffRoute, VerifiedRoute } from './guards';
 
 import ProductListingPage from '../pages/ProductListingPage';
 import ProductDetailPage from '../pages/ProductDetailPage';
@@ -17,7 +17,10 @@ import RegisterPage from '../pages/auth/RegisterPage';
 import VerifyEmailPage from '../pages/auth/VerifyEmailPage';
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
-import AccountPage from '../pages/auth/AccountPage';
+import AccountLayout from '../components/account/AccountLayout';
+import DashboardPage from '../pages/account/DashboardPage';
+import ReceiptsPage from '../pages/account/ReceiptsPage';
+import ProfilePage from '../pages/account/ProfilePage';
 
 import PromotionsListPage from '../pages/admin/PromotionsListPage';
 import PromotionFormPage from '../pages/admin/PromotionFormPage';
@@ -51,10 +54,15 @@ const router = createBrowserRouter([
             {
                 path: 'account',
                 element: (
-                    <AuthenticatedRoute>
-                        <AccountPage />
-                    </AuthenticatedRoute>
+                    <VerifiedRoute>
+                        <AccountLayout />
+                    </VerifiedRoute>
                 ),
+                children: [
+                    { index: true, element: <DashboardPage /> },
+                    { path: 'receipts', element: <ReceiptsPage /> },
+                    { path: 'profile', element: <ProfilePage /> },
+                ],
             },
             {
                 path: 'admin',

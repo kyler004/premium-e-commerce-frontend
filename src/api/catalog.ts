@@ -3,7 +3,7 @@ import type { Category, PaginatedResponse, Product, ProductFilters, Review, Vari
 
 export const catalogApi = {
     listCategories: (params?: { page?: number; page_size?: number; search?: string }) =>
-        getPaginated<Category>('/api/categories/', params),
+        getPaginated<Category>('/api/categories/', params, false),
 
     getCategory: (id: number) => apiClient.get<Category>(`/api/categories/${id}/`, false),
 
@@ -54,5 +54,5 @@ export const catalogApi = {
     deleteInventory: (id: number) => apiClient.delete(`/api/inventories/${id}/`),
 
     listProductReviews: (productId: number, page = 1, page_size = 10) =>
-        getPaginated<Review>(`/api/products/${productId}/reviews/`, { page, page_size }),
+        getPaginated<Review>(`/api/products/${productId}/reviews/`, { page, page_size }, false),
 };

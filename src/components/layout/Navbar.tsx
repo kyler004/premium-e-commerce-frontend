@@ -85,7 +85,7 @@ const Navbar = () => {
 
                     {user ? (
                         <div className="flex items-center gap-3">
-                            <Link to="/account" className="text-gray-400 hover:text-white">
+                            <Link to="/account" className={`transition-colors ${location.pathname.startsWith('/account') ? 'text-accent' : 'text-gray-400 hover:text-white'}`}>
                                 <User size={20} />
                             </Link>
                             <button onClick={handleLogout} className="text-gray-400 hover:text-white" aria-label="Logout">
