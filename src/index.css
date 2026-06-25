@@ -29,3 +29,38 @@
     animation: none;
   }
 }
+
+@media print {
+  nav,
+  .receipt-no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .receipt-print-area,
+  .receipt-print-area .bg-surface {
+    background: white !important;
+    border-color: #d1d5db !important;
+    box-shadow: none !important;
+  }
+
+  .receipt-print-area .text-white,
+  .receipt-print-area .text-accent,
+  .receipt-print-area .text-emerald-400 {
+    color: black !important;
+  }
+
+  .receipt-print-area .text-gray-400,
+  .receipt-print-area .text-gray-500,
+  .receipt-print-area .text-gray-600 {
+    color: #4b5563 !important;
+  }
+
+  .receipt-print-area .divide-border > :not([hidden]) ~ :not([hidden]) {
+    border-color: #e5e7eb !important;
+  }
+}

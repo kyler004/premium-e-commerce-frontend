@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, FileText } from 'lucide-react';
 import { ordersApi } from '../../api/orders';
 import type { Order } from '../../types/api';
 import Button from '../../components/ui/Button';
@@ -117,7 +117,15 @@ const OrderDetailPageContent = () => {
                     )}
 
                     {order.paid_at && (
-                        <p className="text-xs text-emerald-400">Paid on {formatDate(order.paid_at)}</p>
+                        <div className="flex flex-col gap-3">
+                            <p className="text-xs text-emerald-400">Paid on {formatDate(order.paid_at)}</p>
+                            <Link to={`/orders/${order.id}/receipt`}>
+                                <Button variant="secondary" fullWidth>
+                                    <FileText size={16} />
+                                    View Receipt
+                                </Button>
+                            </Link>
+                        </div>
                     )}
                 </div>
             </div>

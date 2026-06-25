@@ -101,8 +101,45 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     return parseResponse<T>(response);
 }
 
+async function requestText(path: string, options: RequestOptions = {}): Promise<string> {
+    const { auth = true, skipRefresh = false, headers, method = 'GET' } = options;
+
+    const requestHeaders: Record<string, string> = {
+        ...(headers as Record<string, string>),
+    };
+
+    if (auth && accessToken) {
+        requestHeaders['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    const response = await fetch(`${BASE_URL}${path}`, {
+        method,
+        headers: requestHeaders,
+    });
+
+    if (response.status === 401 && auth && !skipRefresh && refreshHandler) {
+        const newToken = await refreshHandler();
+        if (newToken) {
+            return requestText(path, { ...options, skipRefresh: true });
+        }
+    }
+
+    if (!response.ok) {
+        let errorBody: ApiErrorBody = { detail: response.statusText };
+        try {
+            errorBody = await parseResponse<ApiErrorBody>(response);
+        } catch {
+            // keep default
+        }
+        throw new ApiError(response.status, errorBody);
+    }
+
+    return response.text();
+}
+
 export const apiClient = {
     get: <T>(path: string, auth = true) => request<T>(path, { method: 'GET', auth }),
+    getText: (path: string, auth = true) => requestText(path, { method: 'GET', auth }),
     post: <T>(path: string, body?: unknown, auth = true) =>
         request<T>(path, { method: 'POST', body, auth }),
     patch: <T>(path: string, body?: unknown, auth = true) =>

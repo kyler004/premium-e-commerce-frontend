@@ -14,4 +14,7 @@ export const ordersApi = {
         apiClient.post<Order>(`/api/orders/${id}/confirm-payment/`),
 
     cancel: (id: number) => apiClient.post<Order>(`/api/orders/${id}/cancel/`),
+
+    getReceiptHtml: (id: number) =>
+        apiClient.getText(`/api/orders/${id}/receipt/`),
 };

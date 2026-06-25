@@ -9,6 +9,7 @@ import CartPage from '../pages/CartPage';
 import CheckoutPage from '../pages/orders/CheckoutPage';
 import OrderHistoryPage from '../pages/orders/OrderHistoryPage';
 import OrderDetailPage from '../pages/orders/OrderDetailPage';
+import ReceiptPage from '../pages/orders/ReceiptPage';
 import WishlistPage from '../pages/wishlist/WishlistPage';
 
 import LoginPage from '../pages/auth/LoginPage';
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
             { path: 'checkout', element: <CheckoutPage /> },
             { path: 'orders', element: <OrderHistoryPage /> },
             { path: 'orders/:id', element: <OrderDetailPage /> },
+            { path: 'orders/:id/receipt', element: <ReceiptPage /> },
             { path: 'wishlist', element: <WishlistPage /> },
             { path: 'login', element: <LoginPage /> },
             { path: 'register', element: <RegisterPage /> },
