@@ -6,7 +6,10 @@ export const ordersApi = {
         apiClient.post<Order>('/api/orders/checkout/', { shipping }),
 
     list: (params: OrderListParams = {}) =>
-        getPaginated<OrderListItem>('/api/orders/', params),
+        getPaginated<OrderListItem>(
+            '/api/orders/',
+            params as Record<string, string | number | undefined>
+        ),
 
     get: (id: number) => apiClient.get<Order>(`/api/orders/${id}/`),
 
