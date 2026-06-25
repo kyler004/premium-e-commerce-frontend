@@ -77,7 +77,7 @@ const CategoryChart = ({ data }: CategoryChartProps) => {
                             contentStyle={chartTooltipStyle}
                             labelStyle={{ color: '#9ca3af' }}
                             itemStyle={{ color: '#e8ff00' }}
-                            formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Spent']}
+                            formatter={(value: number) => [`$${Number(value).toFixed(2)}`, 'Spent']}
                         />
                         <Bar
                             dataKey="total"
