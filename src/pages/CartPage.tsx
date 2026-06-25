@@ -6,6 +6,7 @@ import CartItemRow from '../components/cart/CartItemRow';
 import OrderSummary from '../components/cart/OrderSumary';
 import Button from '../components/ui/Button';
 import PageHeader from '../components/ui/PageHeader';
+import PageContainer from '../components/layout/PageContainer';
 import { VerifiedRoute } from '../router/guards';
 
 const CartPageContent = () => {
@@ -18,14 +19,14 @@ const CartPageContent = () => {
     }, [fetchCart]);
 
     if (isLoading && !cart) {
-        return <div className="mx-auto max-w-7xl px-6 py-12 text-gray-500">Loading cart...</div>;
+        return <PageContainer className="text-gray-500">Loading cart...</PageContainer>;
     }
 
     const items = cart?.items ?? [];
 
     if (items.length === 0) {
         return (
-            <div className="mx-auto flex min-h-[70vh] max-w-7xl flex-col items-center justify-center gap-6 px-6">
+            <div className="mx-auto flex min-h-[70vh] max-w-7xl flex-col items-center justify-center gap-6 px-4 md:px-6">
                 <div className="flex flex-col items-center gap-4 text-center">
                     <div className="border border-border p-6">
                         <ShoppingBag size={48} className="text-border" />
@@ -44,7 +45,7 @@ const CartPageContent = () => {
     }
 
     return (
-        <div className="mx-auto max-w-7xl px-6 py-12 fade-in-element">
+        <PageContainer>
             <PageHeader
                 eyebrow="Review"
                 title="Your Cart"
@@ -63,7 +64,7 @@ const CartPageContent = () => {
                 </div>
                 <OrderSummary />
             </div>
-        </div>
+        </PageContainer>
     );
 };
 

@@ -8,7 +8,7 @@ interface RecentOrdersPanelProps {
 }
 
 const RecentOrdersPanel = ({ orders }: RecentOrdersPanelProps) => (
-    <div className="border border-border bg-surface p-6">
+    <div className="min-w-0 border border-border bg-surface p-4 md:p-6">
         <h2 className="mb-4 text-sm font-black uppercase tracking-widest text-white">
             Recent Orders
         </h2>
@@ -17,7 +17,10 @@ const RecentOrdersPanel = ({ orders }: RecentOrdersPanelProps) => (
         ) : (
             <div className="flex flex-col divide-y divide-border">
                 {orders.map((order) => (
-                    <div key={order.id} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
+                    <div
+                        key={order.id}
+                        className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+                    >
                         <div>
                             <Link
                                 to={`/orders/${order.id}`}

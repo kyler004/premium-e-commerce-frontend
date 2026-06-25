@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ShippingForm from '../../components/forms/ShippingForm';
 import PageHeader from '../../components/ui/PageHeader';
+import PageContainer from '../../components/layout/PageContainer';
 import { VerifiedRoute } from '../../router/guards';
 import { ordersApi } from '../../api/orders';
 import { useCartStore } from '../../store/cartStore';
@@ -33,15 +34,15 @@ const CheckoutPageContent = () => {
     };
 
     return (
-        <div className="mx-auto max-w-7xl px-6 py-12 fade-in-element">
+        <PageContainer>
             <PageHeader eyebrow="Checkout" title="Complete Order" />
             <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                     <ShippingForm onSubmit={handleSubmit} loading={loading} />
                 </div>
                 <OrderSummary />
             </div>
-        </div>
+        </PageContainer>
     );
 };
 

@@ -5,6 +5,7 @@ import { ordersApi } from '../../api/orders';
 import type { Order } from '../../types/api';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
+import PageContainer from '../../components/layout/PageContainer';
 import { VerifiedRoute } from '../../router/guards';
 import { formatDate, formatPrice } from '../../lib/format';
 import { useToast } from '../../hooks/useToast';
@@ -54,20 +55,20 @@ const OrderDetailPageContent = () => {
     };
 
     if (!order) {
-        return <div className="mx-auto max-w-7xl px-6 py-12 text-gray-500">Loading order...</div>;
+        return <PageContainer className="text-gray-500">Loading order...</PageContainer>;
     }
 
     return (
-        <div className="mx-auto max-w-7xl px-6 py-12 fade-in-element">
+        <PageContainer>
             <Link to="/orders" className="mb-8 flex w-fit items-center gap-2 text-xs uppercase tracking-widest text-gray-500 hover:text-accent">
                 <ArrowLeft size={14} />
                 Back to Orders
             </Link>
 
-            <div className="mb-8 flex items-end justify-between border-b border-border pb-6">
+            <div className="mb-8 flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-500">Order</p>
-                    <h1 className="text-4xl font-black uppercase tracking-tight text-white">#{order.id}</h1>
+                    <h1 className="text-3xl font-black uppercase tracking-tight text-white md:text-4xl">#{order.id}</h1>
                 </div>
                 <Badge label={order.status} variant={order.status === 'paid' ? 'verified' : order.status === 'cancelled' ? 'outofstock' : 'category'} />
             </div>
@@ -129,7 +130,7 @@ const OrderDetailPageContent = () => {
                     )}
                 </div>
             </div>
-        </div>
+        </PageContainer>
     );
 };
 

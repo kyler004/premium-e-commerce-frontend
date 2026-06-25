@@ -23,6 +23,15 @@
   animation: fadeIn 0.25s ease-in-out;
 }
 
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fade-in-element,
   .animate-pulse {

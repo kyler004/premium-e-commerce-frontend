@@ -15,6 +15,7 @@ import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import Rating from '../components/ui/Rating';
 import { ProductDetailSkeleton } from '../components/ui/Skeleton';
+import PageContainer from '../components/layout/PageContainer';
 import { useToast } from '../hooks/useToast';
 import { ApiError, parseApiError } from '../api/client';
 
@@ -103,7 +104,7 @@ const ProductDetailContent = ({ productId }: ProductDetailContentProps) => {
     };
 
     return (
-        <div className="mx-auto max-w-7xl px-6 py-12 fade-in-element">
+        <PageContainer>
             <Link to="/" className="mb-8 flex w-fit items-center gap-2 text-xs uppercase tracking-widest text-gray-500 hover:text-accent transition-colors">
                 <ArrowLeft size={14} />
                 Back to Shop
@@ -174,7 +175,7 @@ const ProductDetailContent = ({ productId }: ProductDetailContentProps) => {
                     reviewCount={product.review_count}
                 />
             </div>
-        </div>
+        </PageContainer>
     );
 };
 

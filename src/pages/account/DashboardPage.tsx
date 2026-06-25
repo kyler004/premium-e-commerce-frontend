@@ -113,15 +113,19 @@ const DashboardPage = () => {
                 <KpiCard label="Total Saved" value={formatPrice(summary.total_savings)} subtext="From promotions" />
             </div>
 
-            <div className={`mt-8 grid gap-6 lg:grid-cols-2 ${loading || isRefetching ? 'opacity-60' : ''}`}>
-                <SpendingChart data={summary.spending_by_month} periodLabel={PERIOD_LABELS[period]} />
-                <CategoryChart data={summary.spending_by_category} />
+            <div className={`mt-8 grid min-w-0 gap-6 lg:grid-cols-2 ${loading || isRefetching ? 'opacity-60' : ''}`}>
+                <div className="min-w-0">
+                    <SpendingChart data={summary.spending_by_month} periodLabel={PERIOD_LABELS[period]} />
+                </div>
+                <div className="min-w-0">
+                    <CategoryChart data={summary.spending_by_category} />
+                </div>
             </div>
 
             <div className="mt-8 grid gap-6 lg:grid-cols-2">
                 <RecentOrdersPanel orders={summary.recent_paid_orders} />
 
-                <div className="border border-border bg-surface p-6">
+                <div className="min-w-0 border border-border bg-surface p-4 md:p-6">
                     <h2 className="mb-4 text-sm font-black uppercase tracking-widest text-white">
                         Order Status
                     </h2>
@@ -142,7 +146,7 @@ const DashboardPage = () => {
                 </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-6 text-xs uppercase tracking-widest">
+            <div className="mt-8 flex flex-col gap-3 text-xs uppercase tracking-widest sm:flex-row sm:gap-6">
                 <Link to="/orders" className="text-gray-500 hover:text-accent">
                     View all orders →
                 </Link>

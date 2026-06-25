@@ -11,7 +11,7 @@ interface ReceiptArchiveRowProps {
 }
 
 const ReceiptArchiveRow = ({ order, onOpenOfficial, openingId }: ReceiptArchiveRowProps) => (
-    <div className="flex flex-wrap items-center justify-between gap-4 p-6">
+    <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div>
             <Link
                 to={`/orders/${order.id}`}
@@ -24,10 +24,10 @@ const ReceiptArchiveRow = ({ order, onOpenOfficial, openingId }: ReceiptArchiveR
                 {order.item_count} items
             </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
             <span className="text-sm font-black text-accent">{formatPrice(order.total)}</span>
-            <Link to={`/orders/${order.id}/receipt`}>
-                <Button variant="secondary" size="sm">
+            <Link to={`/orders/${order.id}/receipt`} className="w-full sm:w-auto">
+                <Button variant="secondary" size="sm" fullWidth className="sm:w-auto">
                     <FileText size={14} />
                     View Receipt
                 </Button>
@@ -35,6 +35,8 @@ const ReceiptArchiveRow = ({ order, onOpenOfficial, openingId }: ReceiptArchiveR
             <Button
                 variant="ghost"
                 size="sm"
+                fullWidth
+                className="sm:w-auto"
                 loading={openingId === order.id}
                 onClick={() => onOpenOfficial(order.id)}
             >

@@ -1,8 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { SlidersHorizontal } from 'lucide-react';
 import FilterSidebar from '../components/product/FilterSidebar';
 import ProductGrid from '../components/product/ProductGrid';
 import PageHeader from '../components/ui/PageHeader';
+import PageContainer from '../components/layout/PageContainer';
 import Pagination from '../components/ui/Pagination';
+import Button from '../components/ui/Button';
 import { useCatalogStore } from '../store/catalogStore';
 
 const ProductListingPage = () => {
@@ -17,6 +20,7 @@ const ProductListingPage = () => {
     const fetchProducts = useCatalogStore((state) => state.fetchProducts);
     const fetchCategories = useCatalogStore((state) => state.fetchCategories);
     const setPage = useCatalogStore((state) => state.setPage);
+    const [filtersOpen, setFiltersOpen] = useState(false);
 
     useEffect(() => {
         fetchCategories();
@@ -24,11 +28,10 @@ const ProductListingPage = () => {
     }, [fetchCategories, fetchProducts]);
 
     const totalPages = Math.max(1, Math.ceil(count / pageSize));
-
     const resultLabel = hasLoaded ? `${count}` : '—';
 
     return (
-        <div className="mx-auto max-w-7xl px-6 py-12 fade-in-element">
+        <PageContainer>
             <PageHeader
                 eyebrow="Collection"
                 title="All Products"
@@ -42,9 +45,22 @@ const ProductListingPage = () => {
                 }
             />
 
-            <div className="flex gap-12">
-                <FilterSidebar />
-                <div className="flex-1">
+            <div className="mb-4 lg:hidden">
+                <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setFiltersOpen((open) => !open)}
+                >
+                    <SlidersHorizontal size={14} />
+                    {filtersOpen ? 'Hide Filters' : 'Filters'}
+                </Button>
+            </div>
+
+            <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
+                <div className={`${filtersOpen ? 'block' : 'hidden'} lg:block`}>
+                    <FilterSidebar />
+                </div>
+                <div className="min-w-0 flex-1">
                     <ProductGrid
                         products={products}
                         hasLoaded={hasLoaded}
@@ -63,7 +79,7 @@ const ProductListingPage = () => {
                     )}
                 </div>
             </div>
-        </div>
+        </PageContainer>
     );
 };
 

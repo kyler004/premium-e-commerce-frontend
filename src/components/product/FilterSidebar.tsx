@@ -47,7 +47,7 @@ const FilterSidebar = () => {
         filters.ordering !== '';
 
     return (
-        <aside className="flex w-64 shrink-0 flex-col gap-8">
+        <aside className="flex w-full shrink-0 flex-col gap-8 lg:w-64">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-white">
                     <SlidersHorizontal size={16} className="text-accent" />

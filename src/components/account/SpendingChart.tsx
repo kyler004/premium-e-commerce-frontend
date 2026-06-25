@@ -9,20 +9,16 @@ import {
 } from 'recharts';
 import type { SpendingByMonth } from '../../types/api';
 import { formatPeriodLabel, parseAmount } from '../../lib/format';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { CHART_COLORS, chartTooltipStyle } from './chartTheme';
 
 interface SpendingChartProps {
     data: SpendingByMonth[];
     periodLabel: string;
 }
 
-const chartTooltipStyle = {
-    backgroundColor: '#111111',
-    border: '1px solid #1f1f1f',
-    borderRadius: 0,
-    fontSize: 12,
-};
-
 const SpendingChart = ({ data, periodLabel }: SpendingChartProps) => {
+    const isMdUp = useMediaQuery('(min-width: 768px)');
     const chartData = data.map((item) => ({
         label: formatPeriodLabel(item.period),
         total: parseAmount(item.total),
@@ -31,7 +27,7 @@ const SpendingChart = ({ data, periodLabel }: SpendingChartProps) => {
 
     if (chartData.length === 0) {
         return (
-            <div className="border border-border bg-surface p-6">
+            <div className="min-w-0 border border-border bg-surface p-4 md:p-6">
                 <h2 className="mb-4 text-sm font-black uppercase tracking-widest text-white">
                     Spending — {periodLabel}
                 </h2>
@@ -46,36 +42,45 @@ const SpendingChart = ({ data, periodLabel }: SpendingChartProps) => {
         typeof window !== 'undefined' &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    const denseLabels = chartData.length > 6 || !isMdUp;
+    const chartMargin = isMdUp
+        ? { top: 8, right: 8, left: 0, bottom: 0 }
+        : { top: 8, right: 4, left: -8, bottom: 24 };
+
     return (
-        <div className="border border-border bg-surface p-6">
+        <div className="min-w-0 border border-border bg-surface p-4 md:p-6">
             <h2 className="mb-4 text-sm font-black uppercase tracking-widest text-white">
                 Spending — {periodLabel}
             </h2>
-            <div className="h-64">
+            <div className="h-56 sm:h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                        <CartesianGrid stroke="#1f1f1f" vertical={false} />
+                    <BarChart data={chartData} margin={chartMargin}>
+                        <CartesianGrid stroke={CHART_COLORS.grid} vertical={false} />
                         <XAxis
                             dataKey="label"
-                            tick={{ fill: '#6b7280', fontSize: 10 }}
-                            axisLine={{ stroke: '#1f1f1f' }}
+                            tick={{ fill: CHART_COLORS.axis, fontSize: 10 }}
+                            axisLine={{ stroke: CHART_COLORS.grid }}
                             tickLine={false}
+                            angle={denseLabels ? -35 : 0}
+                            textAnchor={denseLabels ? 'end' : 'middle'}
+                            height={denseLabels ? 50 : 30}
+                            interval="preserveStartEnd"
                         />
                         <YAxis
-                            tick={{ fill: '#6b7280', fontSize: 10 }}
+                            tick={{ fill: CHART_COLORS.axis, fontSize: 10 }}
                             axisLine={false}
                             tickLine={false}
                             tickFormatter={(v: number) => `$${v}`}
                         />
                         <Tooltip
                             contentStyle={chartTooltipStyle}
-                            labelStyle={{ color: '#9ca3af' }}
-                            itemStyle={{ color: '#e8ff00' }}
+                            labelStyle={{ color: CHART_COLORS.axisLabel }}
+                            itemStyle={{ color: CHART_COLORS.accent }}
                             formatter={(value) => [`$${Number(value ?? 0).toFixed(2)}`, 'Spent']}
                         />
                         <Bar
                             dataKey="total"
-                            fill="#e8ff00"
+                            fill={CHART_COLORS.accent}
                             radius={0}
                             isAnimationActive={!prefersReducedMotion}
                         />

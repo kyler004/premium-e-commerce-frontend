@@ -4,6 +4,7 @@ import { Heart, ArrowLeft } from 'lucide-react';
 import { useWishlistStore } from '../../store/wishlistStore';
 import { useCartStore } from '../../store/cartStore';
 import PageHeader from '../../components/ui/PageHeader';
+import PageContainer from '../../components/layout/PageContainer';
 import Button from '../../components/ui/Button';
 import Select from '../../components/ui/Select';
 import { VerifiedRoute } from '../../router/guards';
@@ -98,7 +99,7 @@ const WishlistPageContent = () => {
     }
 
     return (
-        <div className="mx-auto max-w-7xl px-6 py-12 fade-in-element">
+        <PageContainer>
             <PageHeader eyebrow="Saved" title="Wishlist" trailing={<span className="text-sm text-gray-500">{items.length} items</span>} />
             <div className="flex flex-col divide-y divide-border border border-border">
                 {items.map((item) => (
@@ -125,7 +126,7 @@ const WishlistPageContent = () => {
                     onMove={handleMove}
                 />
             )}
-        </div>
+        </PageContainer>
     );
 };
 

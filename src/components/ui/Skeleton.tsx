@@ -24,7 +24,7 @@ export const ProductGridSkeleton = ({ count = 12 }: { count?: number }) => (
 );
 
 export const ProductDetailSkeleton = () => (
-    <div className="mx-auto max-w-7xl px-6 py-12">
+    <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 md:py-12">
         <Skeleton className="mb-8 h-4 w-32" />
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
             <div className="flex gap-4">

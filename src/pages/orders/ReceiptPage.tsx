@@ -7,6 +7,7 @@ import OrderReceipt from '../../components/orders/OrderReceipt';
 import OfficialReceiptViewer, { type OfficialReceiptViewerHandle } from '../../components/orders/OfficialReceiptViewer';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
+import PageContainer from '../../components/layout/PageContainer';
 import { VerifiedRoute } from '../../router/guards';
 import { getReceiptErrorMessage, openReceiptInNewTab } from '../../lib/receipt';
 import { useToast } from '../../hooks/useToast';
@@ -51,17 +52,24 @@ const ReceiptPageContent = () => {
         }
     };
 
+    const tabClass = (active: boolean) =>
+        `flex-1 border px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-colors sm:flex-none ${
+            active
+                ? 'border-accent bg-accent/5 text-accent'
+                : 'border-border text-gray-500 hover:border-gray-600 hover:text-white'
+        }`;
+
     if (!order) {
         return (
-            <div className="mx-auto max-w-7xl px-6 py-12 text-gray-500">
+            <PageContainer className="text-gray-500">
                 Loading receipt...
-            </div>
+            </PageContainer>
         );
     }
 
     if (order.status !== 'paid') {
         return (
-            <div className="mx-auto max-w-7xl px-6 py-12 fade-in-element">
+            <PageContainer>
                 <Link
                     to={`/orders/${order.id}`}
                     className="receipt-no-print mb-8 flex w-fit items-center gap-2 text-xs uppercase tracking-widest text-gray-500 hover:text-accent"
@@ -69,7 +77,7 @@ const ReceiptPageContent = () => {
                     <ArrowLeft size={14} />
                     Back to Order
                 </Link>
-                <div className="border border-border bg-surface p-8 text-center">
+                <div className="border border-border bg-surface p-6 text-center md:p-8">
                     <p className="text-sm font-semibold uppercase tracking-widest text-gray-400">
                         Receipt unavailable
                     </p>
@@ -80,19 +88,12 @@ const ReceiptPageContent = () => {
                         <Button variant="secondary">View Order</Button>
                     </Link>
                 </div>
-            </div>
+            </PageContainer>
         );
     }
 
-    const tabClass = (active: boolean) =>
-        `border px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-colors ${
-            active
-                ? 'border-accent bg-accent/5 text-accent'
-                : 'border-border text-gray-500 hover:border-gray-600 hover:text-white'
-        }`;
-
     return (
-        <div className="mx-auto max-w-7xl px-6 py-12 fade-in-element">
+        <PageContainer>
             <Link
                 to={`/orders/${order.id}`}
                 className="receipt-no-print mb-8 flex w-fit items-center gap-2 text-xs uppercase tracking-widest text-gray-500 hover:text-accent"
@@ -101,20 +102,20 @@ const ReceiptPageContent = () => {
                 Back to Order
             </Link>
 
-            <div className="receipt-no-print mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
+            <div className="receipt-no-print mb-8 flex flex-col gap-4 border-b border-border pb-6 md:flex-row md:items-end md:justify-between">
                 <div>
                     <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-500">
                         Account
                     </p>
-                    <h1 className="text-4xl font-black uppercase tracking-tight text-white">
+                    <h1 className="text-3xl font-black uppercase tracking-tight text-white md:text-4xl">
                         Receipt #{order.id}
                     </h1>
                 </div>
                 <Badge label={order.status} variant="verified" />
             </div>
 
-            <div className="receipt-no-print mb-6 flex flex-wrap items-center justify-between gap-4">
-                <div className="flex gap-2">
+            <div className="receipt-no-print mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex w-full gap-2 md:w-auto">
                     <button type="button" className={tabClass(view === 'app')} onClick={() => setView('app')}>
                         App Receipt
                     </button>
@@ -123,14 +124,16 @@ const ReceiptPageContent = () => {
                     </button>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                    <Button variant="secondary" size="sm" onClick={handlePrint}>
+                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                    <Button variant="secondary" size="sm" fullWidth className="sm:w-auto" onClick={handlePrint}>
                         <Printer size={14} />
                         Print
                     </Button>
                     <Button
                         variant="secondary"
                         size="sm"
+                        fullWidth
+                        className="sm:w-auto"
                         loading={openingTab}
                         onClick={handleOpenOfficialTab}
                     >
@@ -140,18 +143,20 @@ const ReceiptPageContent = () => {
                 </div>
             </div>
 
-            {view === 'app' ? (
-                <OrderReceipt order={order} />
-            ) : (
-                <OfficialReceiptViewer ref={officialReceiptRef} orderId={order.id} />
-            )}
+            <div className="min-w-0">
+                {view === 'app' ? (
+                    <OrderReceipt order={order} />
+                ) : (
+                    <OfficialReceiptViewer ref={officialReceiptRef} orderId={order.id} />
+                )}
+            </div>
 
             <p className="receipt-no-print mt-4 text-xs text-gray-600">
                 {view === 'app'
                     ? 'Styled to match your VOIDSTEP account. Use Official Receipt for the server-generated document.'
                     : 'Server-generated receipt from the backend. Print or open in a new tab for PDF export.'}
             </p>
-        </div>
+        </PageContainer>
     );
 };
 

@@ -9,19 +9,15 @@ import {
 } from 'recharts';
 import type { SpendingByCategory } from '../../types/api';
 import { parseAmount } from '../../lib/format';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { CHART_COLORS, chartTooltipStyle, truncateCategoryLabel } from './chartTheme';
 
 interface CategoryChartProps {
     data: SpendingByCategory[];
 }
 
-const chartTooltipStyle = {
-    backgroundColor: '#111111',
-    border: '1px solid #1f1f1f',
-    borderRadius: 0,
-    fontSize: 12,
-};
-
 const CategoryChart = ({ data }: CategoryChartProps) => {
+    const isMdUp = useMediaQuery('(min-width: 768px)');
     const chartData = data.map((item) => ({
         name: item.category_name,
         total: parseAmount(item.total),
@@ -30,7 +26,7 @@ const CategoryChart = ({ data }: CategoryChartProps) => {
 
     if (chartData.length === 0) {
         return (
-            <div className="border border-border bg-surface p-6">
+            <div className="min-w-0 border border-border bg-surface p-4 md:p-6">
                 <h2 className="mb-4 text-sm font-black uppercase tracking-widest text-white">
                     By Category
                 </h2>
@@ -45,43 +41,47 @@ const CategoryChart = ({ data }: CategoryChartProps) => {
         typeof window !== 'undefined' &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    const chartHeight = Math.max(256, chartData.length * 36);
+    const yAxisWidth = isMdUp ? 100 : 120;
+
     return (
-        <div className="border border-border bg-surface p-6">
+        <div className="min-w-0 overflow-x-auto border border-border bg-surface p-4 md:p-6">
             <h2 className="mb-4 text-sm font-black uppercase tracking-widest text-white">
                 By Category
             </h2>
-            <div className="h-64">
+            <div style={{ height: chartHeight, minWidth: 280 }}>
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={chartData}
                         layout="vertical"
                         margin={{ top: 8, right: 8, left: 8, bottom: 0 }}
                     >
-                        <CartesianGrid stroke="#1f1f1f" horizontal={false} />
+                        <CartesianGrid stroke={CHART_COLORS.grid} horizontal={false} />
                         <XAxis
                             type="number"
-                            tick={{ fill: '#6b7280', fontSize: 10 }}
-                            axisLine={{ stroke: '#1f1f1f' }}
+                            tick={{ fill: CHART_COLORS.axis, fontSize: 10 }}
+                            axisLine={{ stroke: CHART_COLORS.grid }}
                             tickLine={false}
                             tickFormatter={(v: number) => `$${v}`}
                         />
                         <YAxis
                             type="category"
                             dataKey="name"
-                            width={100}
-                            tick={{ fill: '#9ca3af', fontSize: 10 }}
+                            width={yAxisWidth}
+                            tick={{ fill: CHART_COLORS.axisLabel, fontSize: 10 }}
                             axisLine={false}
                             tickLine={false}
+                            tickFormatter={(name: string) => truncateCategoryLabel(name)}
                         />
                         <Tooltip
                             contentStyle={chartTooltipStyle}
-                            labelStyle={{ color: '#9ca3af' }}
-                            itemStyle={{ color: '#e8ff00' }}
+                            labelStyle={{ color: CHART_COLORS.axisLabel }}
+                            itemStyle={{ color: CHART_COLORS.accent }}
                             formatter={(value) => [`$${Number(value ?? 0).toFixed(2)}`, 'Spent']}
                         />
                         <Bar
                             dataKey="total"
-                            fill="#e8ff00"
+                            fill={CHART_COLORS.accent}
                             radius={0}
                             isAnimationActive={!prefersReducedMotion}
                         />
