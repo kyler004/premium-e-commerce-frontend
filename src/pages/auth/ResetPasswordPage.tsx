@@ -4,13 +4,14 @@ import AuthCard from '../../components/auth/AuthCard';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { useToast } from '../../hooks/useToast';
-import { ApiError, getFieldErrors, parseApiError } from '../../api/client';
+import { handleAuthError } from '../../lib/authErrors';
+import { clearPendingResetEmail, getPendingResetEmail } from '../../lib/authSession';
 import { useAuthStore } from '../../store/authStore';
 
 const ResetPasswordPage = () => {
     const location = useLocation();
-    const initialEmail = (location.state as { email?: string })?.email ?? '';
-    const [email, setEmail] = useState(initialEmail);
+    const routeEmail = (location.state as { email?: string })?.email ?? '';
+    const [email, setEmail] = useState(() => getPendingResetEmail(routeEmail));
     const [otp, setOtp] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -24,17 +25,11 @@ const ResetPasswordPage = () => {
         setErrors({});
         try {
             await resetPassword(email, otp, newPassword);
+            clearPendingResetEmail();
             showToast('Password reset successfully.', 'success');
             navigate('/login');
         } catch (err) {
-            if (err instanceof ApiError) {
-                const fieldErrors = getFieldErrors(err.body);
-                if (Object.keys(fieldErrors).length > 0) {
-                    setErrors(Object.fromEntries(Object.entries(fieldErrors).map(([k, v]) => [k, v[0]])));
-                } else {
-                    showToast(parseApiError(err.body), 'error');
-                }
-            }
+            handleAuthError(err, showToast, setErrors);
         }
     };
 

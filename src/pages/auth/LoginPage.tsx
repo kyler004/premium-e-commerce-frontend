@@ -4,7 +4,7 @@ import AuthCard from '../../components/auth/AuthCard';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { useToast } from '../../hooks/useToast';
-import { ApiError, getFieldErrors, parseApiError } from '../../api/client';
+import { handleAuthError } from '../../lib/authErrors';
 import { useAuthStore } from '../../store/authStore';
 
 const LoginPage = () => {
@@ -26,14 +26,7 @@ const LoginPage = () => {
             showToast('Welcome back!', 'success');
             navigate(next);
         } catch (err) {
-            if (err instanceof ApiError) {
-                const fieldErrors = getFieldErrors(err.body);
-                if (Object.keys(fieldErrors).length > 0) {
-                    setErrors(Object.fromEntries(Object.entries(fieldErrors).map(([k, v]) => [k, v[0]])));
-                } else {
-                    showToast(parseApiError(err.body), 'error');
-                }
-            }
+            handleAuthError(err, showToast, setErrors);
         }
     };
 

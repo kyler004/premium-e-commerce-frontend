@@ -4,7 +4,8 @@ import AuthCard from '../../components/auth/AuthCard';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { useToast } from '../../hooks/useToast';
-import { ApiError, parseApiError } from '../../api/client';
+import { handleAuthError } from '../../lib/authErrors';
+import { setPendingResetEmail } from '../../lib/authSession';
 import { useAuthStore } from '../../store/authStore';
 
 const ForgotPasswordPage = () => {
@@ -18,10 +19,11 @@ const ForgotPasswordPage = () => {
         e.preventDefault();
         try {
             await forgotPassword(email);
+            setPendingResetEmail(email);
             setSent(true);
             showToast('If an account exists, a code has been sent.', 'success');
         } catch (err) {
-            if (err instanceof ApiError) showToast(parseApiError(err.body), 'error');
+            handleAuthError(err, showToast);
         }
     };
 

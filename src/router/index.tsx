@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import AdminLayout from '../components/admin/AdminLayout';
-import { StaffRoute, VerifiedRoute } from './guards';
+import { GuestRoute, StaffRoute, VerifiedRoute } from './guards';
 
 import ProductListingPage from '../pages/ProductListingPage';
 import ProductDetailPage from '../pages/ProductDetailPage';
@@ -32,6 +32,7 @@ import VariantsListPage from '../pages/admin/VariantsListPage';
 import VariantFormPage from '../pages/admin/VariantFormPage';
 import InventoriesListPage from '../pages/admin/InventoriesListPage';
 import InventoryFormPage from '../pages/admin/InventoryFormPage';
+import NotFoundPage from '../pages/NotFoundPage';
 
 const router = createBrowserRouter([
     {
@@ -46,8 +47,22 @@ const router = createBrowserRouter([
             { path: 'orders/:id', element: <OrderDetailPage /> },
             { path: 'orders/:id/receipt', element: <ReceiptPage /> },
             { path: 'wishlist', element: <WishlistPage /> },
-            { path: 'login', element: <LoginPage /> },
-            { path: 'register', element: <RegisterPage /> },
+            {
+                path: 'login',
+                element: (
+                    <GuestRoute>
+                        <LoginPage />
+                    </GuestRoute>
+                ),
+            },
+            {
+                path: 'register',
+                element: (
+                    <GuestRoute>
+                        <RegisterPage />
+                    </GuestRoute>
+                ),
+            },
             { path: 'verify-email', element: <VerifyEmailPage /> },
             { path: 'forgot-password', element: <ForgotPasswordPage /> },
             { path: 'reset-password', element: <ResetPasswordPage /> },
@@ -89,6 +104,7 @@ const router = createBrowserRouter([
                     { path: 'inventories/:id/edit', element: <InventoryFormPage /> },
                 ],
             },
+            { path: '*', element: <NotFoundPage /> },
         ],
     },
 ]);

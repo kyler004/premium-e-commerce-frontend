@@ -4,13 +4,14 @@ import AuthCard from '../../components/auth/AuthCard';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { useToast } from '../../hooks/useToast';
-import { ApiError, getFieldErrors, parseApiError } from '../../api/client';
+import { handleAuthError } from '../../lib/authErrors';
+import { clearPendingVerifyEmail, getPendingVerifyEmail } from '../../lib/authSession';
 import { useAuthStore } from '../../store/authStore';
 
 const VerifyEmailPage = () => {
     const location = useLocation();
-    const initialEmail = (location.state as { email?: string })?.email ?? '';
-    const [email, setEmail] = useState(initialEmail);
+    const routeEmail = (location.state as { email?: string })?.email ?? '';
+    const [email, setEmail] = useState(() => getPendingVerifyEmail(routeEmail));
     const [otp, setOtp] = useState('');
     const [errors, setErrors] = useState<Record<string, string>>({});
     const verifyEmail = useAuthStore((s) => s.verifyEmail);
@@ -24,17 +25,11 @@ const VerifyEmailPage = () => {
         setErrors({});
         try {
             await verifyEmail(email, otp);
+            clearPendingVerifyEmail();
             showToast('Email verified! You can now sign in.', 'success');
             navigate('/login');
         } catch (err) {
-            if (err instanceof ApiError) {
-                const fieldErrors = getFieldErrors(err.body);
-                if (Object.keys(fieldErrors).length > 0) {
-                    setErrors(Object.fromEntries(Object.entries(fieldErrors).map(([k, v]) => [k, v[0]])));
-                } else {
-                    showToast(parseApiError(err.body), 'error');
-                }
-            }
+            handleAuthError(err, showToast, setErrors);
         }
     };
 
@@ -43,7 +38,7 @@ const VerifyEmailPage = () => {
             await resendOtp(email, 'signup');
             showToast('Verification code resent.', 'success');
         } catch (err) {
-            if (err instanceof ApiError) showToast(parseApiError(err.body), 'error');
+            handleAuthError(err, showToast);
         }
     };
 

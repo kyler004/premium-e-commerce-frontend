@@ -28,8 +28,14 @@ export class ApiError extends Error {
 
 export const parseApiError = (body: ApiErrorBody): string => {
     if (typeof body.detail === 'string') return body.detail;
+
+    const nonFieldErrors = body.non_field_errors;
+    if (Array.isArray(nonFieldErrors) && nonFieldErrors.length > 0) {
+        return String(nonFieldErrors[0]);
+    }
+
     const fieldErrors = Object.entries(body)
-        .filter(([key]) => key !== 'detail')
+        .filter(([key]) => key !== 'detail' && key !== 'non_field_errors')
         .flatMap(([, value]) => {
             if (Array.isArray(value)) return value.map(String);
             if (typeof value === 'string') return [value];
